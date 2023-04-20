@@ -75,7 +75,7 @@ public final class Server {
             if (options.getSendDeviceMeta()) {
                 Size videoSize = device.getScreenInfo().getVideoSize();
                 String deviceName = Device.getDeviceName();
-                if(Objects.nonNull(options.getDeviceName()) && !options.getDeviceName().isEmpty()) {
+                if (Objects.nonNull(options.getDeviceName()) && !options.getDeviceName().isEmpty()) {
                     deviceName = options.getDeviceName();
                     Ln.i("Using device name " + deviceName + " from command line options.");
                 }

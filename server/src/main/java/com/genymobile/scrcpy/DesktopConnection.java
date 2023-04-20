@@ -45,7 +45,7 @@ public final class DesktopConnection implements Closeable {
         localSocket.connect(new LocalSocketAddress(abstractName));
         return localSocket;
     }
-
+    // TODO: add new parameter for using different socket name when there's more than one screen on a android system
     public static DesktopConnection open(boolean tunnelForward, boolean control, boolean sendDummyByte) throws IOException {
         LocalSocket videoSocket;
         LocalSocket controlSocket = null;
