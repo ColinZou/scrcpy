@@ -8,6 +8,7 @@ import android.os.Build;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public final class Server {
 
@@ -73,7 +74,12 @@ public final class Server {
         try (DesktopConnection connection = DesktopConnection.open(tunnelForward, control, sendDummyByte)) {
             if (options.getSendDeviceMeta()) {
                 Size videoSize = device.getScreenInfo().getVideoSize();
-                connection.sendDeviceMeta(Device.getDeviceName(), videoSize.getWidth(), videoSize.getHeight());
+                String deviceName = Device.getDeviceName();
+                if(Objects.nonNull(options.getDeviceName()) && !options.getDeviceName().isEmpty()) {
+                    deviceName = options.getDeviceName();
+                    Ln.i("Using device name " + deviceName + " from command line options.");
+                }
+                connection.sendDeviceMeta(deviceName, videoSize.getWidth(), videoSize.getHeight());
             }
             ScreenEncoder screenEncoder = new ScreenEncoder(options.getSendFrameMeta(), options.getBitRate(), options.getMaxFps(), codecOptions,
                     options.getEncoderName(), options.getDownsizeOnError());
@@ -262,6 +268,9 @@ public final class Server {
                 case "send_dummy_byte":
                     boolean sendDummyByte = Boolean.parseBoolean(value);
                     options.setSendDummyByte(sendDummyByte);
+                    break;
+                case "device_name":
+                    options.setDeviceName(value.trim());
                     break;
                 case "raw_video_stream":
                     boolean rawVideoStream = Boolean.parseBoolean(value);

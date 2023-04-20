@@ -29,6 +29,8 @@ public class Options {
     private boolean sendFrameMeta = true; // send PTS so that the client may record properly
     private boolean sendDummyByte = true; // write a byte on start to detect connection issues
 
+    private String deviceName;
+
     public Ln.Level getLogLevel() {
         return logLevel;
     }
@@ -195,5 +197,13 @@ public class Options {
 
     public void setSendDummyByte(boolean sendDummyByte) {
         this.sendDummyByte = sendDummyByte;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
     }
 }
