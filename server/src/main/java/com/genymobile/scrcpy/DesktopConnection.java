@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public final class DesktopConnection implements Closeable {
 
@@ -46,11 +47,15 @@ public final class DesktopConnection implements Closeable {
         return localSocket;
     }
     // TODO: add new parameter for using different socket name when there's more than one screen on a android system
-    public static DesktopConnection open(boolean tunnelForward, boolean control, boolean sendDummyByte) throws IOException {
+    public static DesktopConnection open(boolean tunnelForward, boolean control,
+                                         boolean sendDummyByte, String socketName) throws IOException {
         LocalSocket videoSocket;
         LocalSocket controlSocket = null;
+        if(Objects.isNull(socketName) || socketName.length() == 0){
+            socketName = SOCKET_NAME;
+        }
         if (tunnelForward) {
-            LocalServerSocket localServerSocket = new LocalServerSocket(SOCKET_NAME);
+            LocalServerSocket localServerSocket = new LocalServerSocket(socketName);
             try {
                 videoSocket = localServerSocket.accept();
                 if (sendDummyByte) {
@@ -69,10 +74,10 @@ public final class DesktopConnection implements Closeable {
                 localServerSocket.close();
             }
         } else {
-            videoSocket = connect(SOCKET_NAME);
+            videoSocket = connect(socketName);
             if (control) {
                 try {
-                    controlSocket = connect(SOCKET_NAME);
+                    controlSocket = connect(socketName);
                 } catch (IOException | RuntimeException e) {
                     videoSocket.close();
                     throw e;

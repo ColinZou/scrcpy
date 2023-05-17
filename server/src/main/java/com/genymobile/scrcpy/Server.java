@@ -71,7 +71,8 @@ public final class Server {
         boolean control = options.getControl();
         boolean sendDummyByte = options.getSendDummyByte();
 
-        try (DesktopConnection connection = DesktopConnection.open(tunnelForward, control, sendDummyByte)) {
+        try (DesktopConnection connection = DesktopConnection.open(tunnelForward, control,
+                sendDummyByte, options.getTargetSocketName())) {
             if (options.getSendDeviceMeta()) {
                 Size videoSize = device.getScreenInfo().getVideoSize();
                 String deviceName = Device.getDeviceName();
@@ -279,6 +280,9 @@ public final class Server {
                         options.setSendFrameMeta(false);
                         options.setSendDummyByte(false);
                     }
+                    break;
+                case "socket_name":
+                    options.setTargetSocketName(value.trim());
                     break;
                 default:
                     Ln.w("Unknown server option: " + key);

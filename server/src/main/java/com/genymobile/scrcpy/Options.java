@@ -31,6 +31,8 @@ public class Options {
 
     private String deviceName;
 
+    private String targetSocketName;
+
     public Ln.Level getLogLevel() {
         return logLevel;
     }
@@ -205,5 +207,13 @@ public class Options {
 
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
+    }
+    
+    public String getTargetSocketName() {
+        return targetSocketName;
+    }
+
+    public void setTargetSocketName(String targetSocketName) {
+        this.targetSocketName = targetSocketName;
     }
 }

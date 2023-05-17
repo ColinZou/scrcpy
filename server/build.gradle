@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 33
+    compileSdk 33
     defaultConfig {
         applicationId "com.genymobile.scrcpy"
         minSdkVersion 21
@@ -16,8 +16,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildToolsVersion '32.0.0'
 }
-
+tasks.register("prepareKotlinBuildScriptModel"){}
 dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
