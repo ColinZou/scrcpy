@@ -73,13 +73,16 @@ public final class Server {
 
         try (DesktopConnection connection = DesktopConnection.open(tunnelForward, control,
                 sendDummyByte, options.getTargetSocketName())) {
+            // send socket type headers to remote side
+            String deviceName = Device.getDeviceName();
+            if (Objects.nonNull(options.getDeviceName()) && !options.getDeviceName().isEmpty()) {
+                deviceName = options.getDeviceName();
+                Ln.i("Using device name " + deviceName + " from command line options.");
+            }
+            connection.sendSocketTypeHeaders(deviceName);
+
             if (options.getSendDeviceMeta()) {
                 Size videoSize = device.getScreenInfo().getVideoSize();
-                String deviceName = Device.getDeviceName();
-                if (Objects.nonNull(options.getDeviceName()) && !options.getDeviceName().isEmpty()) {
-                    deviceName = options.getDeviceName();
-                    Ln.i("Using device name " + deviceName + " from command line options.");
-                }
                 connection.sendDeviceMeta(deviceName, videoSize.getWidth(), videoSize.getHeight());
             }
             ScreenEncoder screenEncoder = new ScreenEncoder(options.getSendFrameMeta(), options.getBitRate(), options.getMaxFps(), codecOptions,

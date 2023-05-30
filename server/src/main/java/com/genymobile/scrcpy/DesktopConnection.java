@@ -15,11 +15,14 @@ import java.util.Objects;
 public final class DesktopConnection implements Closeable {
 
     private static final int DEVICE_NAME_FIELD_LENGTH = 64;
+    private static final int DEVICE_TYPE_FIELD_LENGTH = 16;
 
     private static final String SOCKET_NAME = "scrcpy";
 
     private final LocalSocket videoSocket;
     private final FileDescriptor videoFd;
+
+    private final FileDescriptor controlFd;
 
     private final LocalSocket controlSocket;
     private final InputStream controlInputStream;
@@ -39,6 +42,7 @@ public final class DesktopConnection implements Closeable {
             controlOutputStream = null;
         }
         videoFd = videoSocket.getFileDescriptor();
+        controlFd = controlSocket.getFileDescriptor();
     }
 
     private static LocalSocket connect(String abstractName) throws IOException {
@@ -98,7 +102,24 @@ public final class DesktopConnection implements Closeable {
             controlSocket.close();
         }
     }
+    public void sendSocketTypeHeaders(String deviceName) throws IOException {
+        sendSocketType(videoFd, deviceName, "video");
+        sendSocketType(controlFd, deviceName, "ctrl");
+    }
 
+    private void sendSocketType(FileDescriptor fd, String deviceName, String type) throws IOException {
+        byte[] videoSocketTypeBuffer = new byte[DEVICE_NAME_FIELD_LENGTH + DEVICE_TYPE_FIELD_LENGTH];
+
+        byte[] deviceNameBytes = deviceName.getBytes(StandardCharsets.UTF_8);
+        int len = StringUtils.getUtf8TruncationIndex(deviceNameBytes, DEVICE_NAME_FIELD_LENGTH - 1);
+        System.arraycopy(deviceNameBytes, 0, videoSocketTypeBuffer, 0, len);
+
+        byte[] deviceTypeBytes = type.getBytes(StandardCharsets.UTF_8);
+        int deviceTypeBytesLen = StringUtils.getUtf8TruncationIndex(deviceTypeBytes, DEVICE_TYPE_FIELD_LENGTH - 1);
+        System.arraycopy(deviceTypeBytes, 0, videoSocketTypeBuffer, DEVICE_NAME_FIELD_LENGTH, deviceTypeBytesLen);
+
+        sendData(fd, videoSocketTypeBuffer);
+    }
     public void sendDeviceMeta(String deviceName, int width, int height) throws IOException {
         byte[] buffer = new byte[DEVICE_NAME_FIELD_LENGTH + 4];
 
@@ -129,5 +150,9 @@ public final class DesktopConnection implements Closeable {
 
     public void sendDeviceMessage(DeviceMessage msg) throws IOException {
         writer.writeTo(msg, controlOutputStream);
+    }
+
+    private void sendData(FileDescriptor fd, byte[] buffer) throws IOException{
+        IO.writeFully(fd, buffer, 0, buffer.length);
     }
 }
